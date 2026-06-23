@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import chalk from "chalk";
 
 /**
  * air — 极简 AI 命令行助手
@@ -128,6 +129,7 @@ async function sendAndPrint(agent: Agent, text: string): Promise<void> {
   await agent.send(text);
   agent.events.off("chunk", onChunk);
   process.stdout.write("\n\n");
+  console.log();
 }
 
 // ==================== 对话循环 ====================
@@ -149,7 +151,7 @@ async function runConversation(initialMessage?: string): Promise<void> {
 
   if (initialMessage) {
     console.log(`\n💬 你: ${initialMessage}`);
-    process.stdout.write("🤖 AI:");
+    console.log(chalk.green.bold("\n🤖 AI:"));
     try {
       await sendAndPrint(agent, initialMessage);
       saveMessages(agent.messages);
@@ -178,7 +180,7 @@ async function runConversation(initialMessage?: string): Promise<void> {
         if (c === "/help") { console.log("\n/exit /quit  退出\n/save        保存快照\n/new         重新开始\n/help        帮助\n"); ask(); return; }
         console.log(`\n❌ 未知命令: ${t}\n`); ask(); return; }
 
-      process.stdout.write("🤖 AI:");
+      console.log(chalk.green.bold("\n🤖 AI:"));
       try {
         await sendAndPrint(agent, t);
         saveMessages(agent.messages);
