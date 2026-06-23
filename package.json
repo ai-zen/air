@@ -1,5 +1,5 @@
 {
-  "name": "air",
+  "name": "@ai-zen/air",
   "version": "0.1.3",
   "description": "极简 AI 命令行助手",
   "type": "module",
