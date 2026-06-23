@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { createInterface } from "node:readline";
 import { Agent, Message } from "@ai-zen/agents-core";
 import { DeltaRenderer } from "./delta-renderer.js";
 import type { AgentNS } from "@ai-zen/agents-core";
@@ -85,76 +84,86 @@ export async function runConversation(initialMessage?: string): Promise<void> {
     ? `\n💬 继续上次对话 (${msgCount} 条，/${contextSize(agent.messages)} 字符，输入 /new 重新开始)\n`
     : "\n💬 air — 极简 AI 助手 (输入 /help 查看命令)\n");
 
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  async function ask() {
+    const { input } = await inquirer.prompt([
+      { type: "input", name: "input", message: "你:" },
+    ]);
+    const t = input.trim();
+    if (!t) { await ask(); return; }
 
-  function ask() {
-    rl.question("💬 你: ", async (input) => {
-      const t = input.trim();
-      if (!t) { ask(); return; }
+    if (t.startsWith("/")) {
+      const c = t.toLowerCase();
+      if (c === "/exit" || c === "/quit") { console.log("\n👋 再见！"); process.exit(0); }
+      if (c === "/save") { console.log(`\n✅ 快照: ${saveSnapshot(agent.messages)}\n`); await ask(); return; }
+      if (c === "/new") { clearMessages(); const msgs = [Message.System(SYSTEM_PROMPT)]; saveMessages(msgs); agent = await buildAgent(msgs); console.log("\n🆕 重新开始\n"); await ask(); return; }
+      if (c === "/load") {
+        const snapshots = listSnapshots();
+        if (snapshots.length === 0) {
+          console.log("\n📭 没有可用的快照\n");
+          await ask(); return;
+        }
+        const { selectedName } = await inquirer.prompt([
+          {
+            type: "list",
+            name: "selectedName",
+            message: "选择要加载的快照:",
+            pageSize: 15,
+            choices: [
+              { name: "↩️  取消操作", value: "" },
+              ...snapshots.map((s) => ({ name: s.date, value: s.name })),
+            ],
+          },
+        ]);
+        if (!selectedName) {
+          console.log("\n已取消\n");
+          await ask(); return;
+        }
+        let msgs = loadSnapshot(selectedName);
+        if (msgs.length === 0) {
+          msgs = [Message.System(SYSTEM_PROMPT)];
+        }
+        saveMessages(msgs);
+        agent = await buildAgent(msgs);
+        const snap = snapshots.find((s) => s.name === selectedName);
+        console.log("\n✅ 已加载快照: " + (snap ? snap.date : selectedName) + "\n");
+        await ask(); return;
+      }
+      if (c === "/back") {
+        await handleBack();
+        await ask(); return;
+      }
+      if (c === "/editor") {
+        const { content } = await inquirer.prompt([
+          { type: "editor", name: "content", message: "编辑消息:" },
+        ]);
+        if (!content.trim()) { console.log("\n已取消\n"); await ask(); return; }
+        try {
+          await sendAndSave(agent, content.trim());
+          saveMessages(agent.messages);
+        } catch (err: any) { console.error(`\n❌ ${err.message}`); }
+        await ask(); return;
+      }
+      if (c === "/help") { console.log("\n/exit /quit  退出\n/save        保存快照\n/load        加载快照\n/new         重新开始\n/back        撤回消息\n/help        帮助\n"); await ask(); return; }
+      console.log(`\n❌ 未知命令: ${t}\n`); await ask(); return; }
 
-      if (t.startsWith("/")) {
-        const c = t.toLowerCase();
-        if (c === "/exit" || c === "/quit") { console.log("\n👋 再见！"); process.exit(0); }
-        if (c === "/save") { console.log(`\n✅ 快照: ${saveSnapshot(agent.messages)}\n`); ask(); return; }
-        if (c === "/new") { clearMessages(); const msgs = [Message.System(SYSTEM_PROMPT)]; saveMessages(msgs); agent = await buildAgent(msgs); console.log("\n🆕 重新开始\n"); ask(); return; }
-        if (c === "/load") {
-          const snapshots = listSnapshots();
-          if (snapshots.length === 0) {
-            console.log("\n📭 没有可用的快照\n");
-            ask(); return;
-          }
-          const { selectedName } = await inquirer.prompt([
-            {
-              type: "list",
-              name: "selectedName",
-              message: "选择要加载的快照:",
-              pageSize: 15,
-              choices: [
-                { name: "↩️  取消操作", value: "" },
-                ...snapshots.map((s) => ({ name: s.date, value: s.name })),
-              ],
-            },
-          ]);
-          if (!selectedName) {
-            console.log("\n已取消\n");
-            ask(); return;
-          }
-          let msgs = loadSnapshot(selectedName);
-          if (msgs.length === 0) {
-            msgs = [Message.System(SYSTEM_PROMPT)];
-          }
+    try {
+      await sendAndSave(agent, t);
+      saveMessages(agent.messages);
+
+      if (shouldMigrate(agent.messages)) {
+        console.log(`🔄 上下文 ${contextSize(agent.messages)}/${MAX_CONTEXT_CHARS}，准备迁移...`);
+        try {
+          const snap = saveSnapshot(agent.messages);
+          console.log(`  💾 快照: ${snap}`);
+          const summary = await generateMigrationDoc(agent.messages);
+          const msgs = [Message.System(SYSTEM_PROMPT), Message.User(summary)];
           saveMessages(msgs);
           agent = await buildAgent(msgs);
-          const snap = snapshots.find((s) => s.name === selectedName);
-          console.log("\n✅ 已加载快照: " + (snap ? snap.date : selectedName) + "\n");
-          ask(); return;
-        }
-        if (c === "/back") {
-          await handleBack();
-          ask(); return;
-        }
-        if (c === "/help") { console.log("\n/exit /quit  退出\n/save        保存快照\n/load        加载快照\n/new         重新开始\n/back        撤回消息\n/help        帮助\n"); ask(); return; }
-        console.log(`\n❌ 未知命令: ${t}\n`); ask(); return; }
-
-      try {
-        await sendAndSave(agent, t);
-        saveMessages(agent.messages);
-
-        if (shouldMigrate(agent.messages)) {
-          console.log(`🔄 上下文 ${contextSize(agent.messages)}/${MAX_CONTEXT_CHARS}，准备迁移...`);
-          try {
-            const snap = saveSnapshot(agent.messages);
-            console.log(`  💾 快照: ${snap}`);
-            const summary = await generateMigrationDoc(agent.messages);
-            const msgs = [Message.System(SYSTEM_PROMPT), Message.User(summary)];
-            saveMessages(msgs);
-            agent = await buildAgent(msgs);
-            console.log("✅ 迁移完成\n");
-          } catch (err: any) { console.error(`❌ 迁移失败: ${err.message}\n`); }
-        }
-      } catch (err: any) { console.error(`\n❌ ${err.message}`); }
-      ask();
-    });
+          console.log("✅ 迁移完成\n");
+        } catch (err: any) { console.error(`❌ 迁移失败: ${err.message}\n`); }
+      }
+    } catch (err: any) { console.error(`\n❌ ${err.message}`); }
+    await ask();
   }
 
   async function handleBack(): Promise<void> {
@@ -242,6 +251,6 @@ export async function runConversation(initialMessage?: string): Promise<void> {
     }
   }
 
-  ask();
+  await ask();
   process.on("SIGINT", () => { console.log("\n\n👋 再见！"); process.exit(0); });
 }

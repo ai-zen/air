@@ -34,8 +34,11 @@ air config
 | 命令 | 说明 |
 |------|------|
 | `/exit` `/quit` | 退出 |
-| `/save` | 保存快照到 snapshots 目录 |
+| `/save` | 保存快照 |
+| `/load` | 加载快照 |
 | `/new` | 清空上下文重新开始 |
+| `/back` | 撤回消息（可选修改后重发） |
+| `/editor` | 打开系统编辑器输入多行文本 |
 | `/help` | 帮助 |
 
 ## 设计
@@ -66,14 +69,14 @@ src/
 ├── tools.ts            # 工具定义——shell (23行)
 ├── agent-factory.ts    # Agent 工厂——构建模型与 Agent (23行)
 ├── migration.ts        # 上下文计数与任务迁移 (72行)
-├── agent-runtime.ts    # 运行时——对话循环与命令处理 (247行)
+├── agent-runtime.ts    # 运行时——对话循环与命令处理 (256行)
 └── __tests__/
     ├── config.test.ts  # 配置/上下文/快照测试 (110行)
     ├── main.test.ts    # contextSize/shouldMigrate 测试 (43行)
     └── tools.test.ts   # shell 工具结构测试 (15行)
 ```
 
-共 40 KB，816 行。
+共 40 KB，826 行。
 
 ## 测试
 
