@@ -17,7 +17,7 @@ npm run build
 
 ```bash
 # 设置 API Key（DeepSeek）
-air config set-key sk-xxxxxxxxxxxxxxxx
+air key sk-xxxxxxxxxxxxxxxx
 
 # 交互模式（自动恢复上次对话）
 air
@@ -26,7 +26,7 @@ air
 air 用 shell 帮我看看当前目录有哪些文件
 
 # 查看配置
-air config show
+air config
 ```
 
 ### 交互命令
@@ -60,15 +60,16 @@ air config show
 
 ```
 src/
+├── cli.ts              # CLI 入口，commander (47行)
 ├── config.ts           # 配置与文件读写 (77行)
 ├── delta-renderer.ts   # 流式渲染器 (126行，复用自 agents 项目)
-├── main.ts             # 入口 + 对话循环 + 迁移 (216行)
+├── main.ts             # 核心逻辑：对话循环 + 迁移 (240行)
 └── __tests__/
     ├── config.test.ts  # 配置/上下文/快照测试 (90行)
     └── main.test.ts    # contextSize/shouldMigrate 测试 (43行)
 ```
 
-共 19 KB，552 行。
+共 40 KB，623 行。
 
 ## 测试
 

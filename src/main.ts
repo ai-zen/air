@@ -1,21 +1,4 @@
-#!/usr/bin/env node
 import chalk from "chalk";
-
-/**
- * air — 极简 AI 命令行助手
- *
- * 用法:
- *   air                 交互模式
- *   air <消息>          直接发消息
- *   air config set-key <key>  设置 API Key
- *
- * 命令:
- *   /exit  /quit    退出
- *   /save           保存快照
- *   /new            重新开始
- *   /help           帮助
- */
-
 import { createInterface } from "node:readline";
 import { Agent, Message, OpenAI, ChatGPT, CallbackTool } from "@ai-zen/agents-core";
 import type { AgentNS } from "@ai-zen/agents-core";
@@ -43,7 +26,7 @@ const MAX_CONTEXT_CHARS = 660000;
 const MODEL_NAME = "deepseek-v4-flash";
 const API_ENDPOINT = "https://api.deepseek.com/v1";
 
-// ==================== 上下文计数 ====================
+// 上下文计数
 
 export function contextSize(messages: any[]): number {
   return JSON.stringify(messages).length;
@@ -53,7 +36,7 @@ export function shouldMigrate(messages: any[]): boolean {
   return contextSize(messages) >= MAX_CONTEXT_CHARS;
 }
 
-// ==================== 唯一的工具：shell ====================
+// 唯一的工具：shell
 
 const shellTool = new CallbackTool({
   function: {
@@ -76,7 +59,7 @@ const shellTool = new CallbackTool({
   },
 });
 
-// ==================== 构建模型 ====================
+// 构建模型
 
 async function buildModel(apiKey: string) {
   const endpoint = new OpenAI({ openai_endpoint: API_ENDPOINT, api_key: apiKey });
@@ -86,7 +69,7 @@ async function buildModel(apiKey: string) {
   });
 }
 
-// ==================== 生成交接文档 ====================
+// 生成交接文档
 
 export async function generateMigrationDoc(messages: any[]): Promise<string> {
   const config = readConfig();
@@ -144,7 +127,7 @@ export async function generateMigrationDoc(messages: any[]): Promise<string> {
   return typeof last.content === "string" ? last.content : "";
 }
 
-// ==================== 构建 Agent（直接从 savedMessages 恢复，已包含 system） ====================
+// 构建 Agent
 
 async function buildAgent(savedMessages: any[]): Promise<Agent> {
   const config = readConfig();
@@ -154,7 +137,7 @@ async function buildAgent(savedMessages: any[]): Promise<Agent> {
   return new Agent({ model, messages, tools: [shellTool] });
 }
 
-// ==================== 流式发送 ====================
+// 流式发送
 
 async function sendAndPrint(agent: Agent, text: string): Promise<void> {
   const renderer = new DeltaRenderer({
@@ -178,16 +161,16 @@ async function sendAndPrint(agent: Agent, text: string): Promise<void> {
   console.log();
 }
 
-// ==================== 对话循环 ====================
+// 对话循环
 
-async function runConversation(initialMessage?: string): Promise<void> {
+export async function runConversation(initialMessage?: string): Promise<void> {
   const config = readConfig();
   if (!config.apiKey) {
-    console.error("❌ 请先设置 API Key: air config set-key <your-key>");
+    console.error("❌ 请先设置 API Key: air key <your-key>");
+    console.error("   获取 Key: https://platform.deepseek.com/api_keys");
     process.exit(1);
   }
 
-  // 读取已有上下文，如果为空则注入 system prompt
   let savedMessages = readMessages();
   if (savedMessages.length === 0) {
     savedMessages = [Message.System(SYSTEM_PROMPT)];
@@ -252,16 +235,6 @@ async function runConversation(initialMessage?: string): Promise<void> {
   process.on("SIGINT", () => { console.log("\n\n👋 再见！"); process.exit(0); });
 }
 
-// ==================== CLI 入口 ====================
+// 重新导出 config 函数供 cli.ts 使用
 
-async function main() {
-  const args = process.argv.slice(2);
-  if (args.length === 0) { await runConversation(); return; }
-  if (args[0] === "config" && args[1] === "set-key" && args[2]) { saveConfig(args[2]); console.log("✅ API Key 已设置"); return; }
-  if (args[0] === "config" && args[1] === "show") { const c = readConfig(); console.log(`API Key: ${c.apiKey ? "****" + c.apiKey.slice(-4) : "(未设置)"}`); return; }
-  await runConversation(args.join(" "));
-}
-
-export function run() { main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); }); }
-const isMainModule = process.argv[1] && (process.argv[1].endsWith("main.js") || process.argv[1].endsWith("main.ts"));
-if (isMainModule) run();
+export { readConfig, saveConfig };
