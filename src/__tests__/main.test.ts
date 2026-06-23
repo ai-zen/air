@@ -30,13 +30,13 @@ describe("shouldMigrate", () => {
   });
 
   it("达到 66 万时迁移", () => {
-    const n = 660000 - JSON.stringify([{ role: "user", content: "" }]).length;
+    const n = 500000 - JSON.stringify([{ role: "user", content: "" }]).length;
     const bigMsg = { role: "user", content: "x".repeat(n) };
     expect(shouldMigrate([bigMsg])).toBe(true);
   });
 
   it("差一点不到时不迁移", () => {
-    const n = 660000 - JSON.stringify([{ role: "user", content: "" }]).length - 1;
+    const n = 500000 - JSON.stringify([{ role: "user", content: "" }]).length - 1;
     const bigMsg = { role: "user", content: "x".repeat(n) };
     expect(shouldMigrate([bigMsg])).toBe(false);
   });

@@ -1,7 +1,7 @@
 import { Agent, Message, OpenAI, ChatGPT } from "@ai-zen/agents-core";
 import { readConfig } from "./config.js";
 
-export const MAX_CONTEXT_CHARS = 660000;
+export const MAX_CONTEXT_CHARS = 500000;
 
 export function contextSize(messages: any[]): number {
   return JSON.stringify(messages).length;
