@@ -7,10 +7,15 @@
 ## 安装
 
 ```bash
+# 全局安装（推荐）
+npm install -g @ai-zen/air
+
+# 或从源码构建
 git clone git@github.com:ai-zen/air.git
 cd air
 npm install
 npm run build
+npm install -g .
 ```
 
 ## 使用
