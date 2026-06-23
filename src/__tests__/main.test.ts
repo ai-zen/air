@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { contextSize, shouldMigrate } from "../main.js";
+import { contextSize, shouldMigrate } from "../migration.js";
 
 describe("contextSize", () => {
   it("空数组", () => {

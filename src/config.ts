@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
@@ -74,4 +74,36 @@ export function saveSnapshot(messages: any[]): string {
   const file = join(d, `${name}.json`);
   writeFileSync(file, JSON.stringify(messages, null, 2), "utf-8");
   return name;
+}
+
+export interface SnapshotInfo {
+  name: string;
+  date: string;
+}
+
+export function listSnapshots(): SnapshotInfo[] {
+  const d = SNAPSHOTS_DIR();
+  if (!existsSync(d)) return [];
+  const files = readdirSync(d).filter((f) => f.endsWith(".json")).sort().reverse();
+  return files.map((f) => {
+    const name = f.replace(/\.json$/, "");
+    const isoStr = name.replace(
+      /^(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z$/,
+      "$1T$2:$3:$4.$5Z"
+    );
+    const date = new Date(isoStr).toLocaleString("zh-CN");
+    return { name, date };
+  });
+}
+
+export function loadSnapshot(name: string): any[] {
+  const d = SNAPSHOTS_DIR();
+  const file = join(d, `${name}.json`);
+  if (!existsSync(file)) return [];
+  try {
+    const data = JSON.parse(readFileSync(file, "utf-8"));
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
 }

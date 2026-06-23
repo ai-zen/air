@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import { Command } from "commander";
-import { runConversation, readConfig, saveConfig } from "./main.js";
+import { runConversation } from "./agent-runtime.js";
+import { readConfig, saveConfig } from "./config.js";
 
 const { version } = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf-8")

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { readConfig, saveConfig, readMessages, saveMessages, clearMessages, saveSnapshot } from "../config.js";
+import { readConfig, saveConfig, readMessages, saveMessages, clearMessages, saveSnapshot, listSnapshots, loadSnapshot } from "../config.js";
 
 describe("config", () => {
   let tempDir: string;
@@ -87,4 +87,25 @@ describe("config", () => {
       expect(loaded).toEqual(msgs);
     });
   });
+
+
+  describe("listSnapshots / loadSnapshot", () => {
+    it("加载不存在的快照返回空数组", () => {
+      expect(loadSnapshot("nonexistent")).toEqual([]);
+    });
+
+    it("保存后能列出并加载快照", () => {
+      const msgs = [{ role: "user", content: "测试" }];
+      const name = saveSnapshot(msgs);
+
+      const list = listSnapshots();
+      expect(list.length).toBe(1);
+      expect(list[0].name).toBe(name);
+      expect(list[0].date).toBeTruthy();
+
+      const loaded = loadSnapshot(name);
+      expect(loaded).toEqual(msgs);
+    });
+  });
+
 });
