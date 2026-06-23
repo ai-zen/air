@@ -114,7 +114,10 @@ async function buildAgent(savedMessages: any[]): Promise<Agent> {
 // ==================== 流式发送 ====================
 
 async function sendAndPrint(agent: Agent, text: string): Promise<void> {
-  const renderer = new DeltaRenderer();
+  const renderer = new DeltaRenderer({
+    reasoningHeader: "\n💭 思考中...\n",
+    contentHeader: "\n💭 回答中...\n",
+  });
 
   function onChunk(chunk: AgentNS.StreamResponseData) {
     const delta = chunk?.choices?.[0]?.delta;
