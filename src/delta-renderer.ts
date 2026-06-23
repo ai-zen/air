@@ -121,6 +121,7 @@ export class DeltaRenderer {
           }
         }
       }
+          process.stdout.write("\n");
     }
   }
 }
