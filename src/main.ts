@@ -22,7 +22,7 @@ import { readConfig, saveConfig, readMessages, saveMessages, clearMessages, save
 import { execSync } from "node:child_process";
 import { DeltaRenderer } from "./delta-renderer.js";
 
-const SYSTEM_PROMPT = "你是一个AI助手，专门帮助用户回答问题和执行任务。请用中文回复。";
+const SYSTEM_PROMPT = "你是一个AI助手，专门帮助用户回答问题和执行任务。请用中文回复。\n\n你可以使用 shell 工具执行任何命令。如果你有需要长期记住的信息（用户偏好、项目约定、任务进度等），请直接写入 ~/.ai-zen/air/ 目录下的文件，下次启动时用 shell 读取即可。这是你唯一的记忆方式。";
 const MAX_CONTEXT_CHARS = 660000;
 const MODEL_NAME = "deepseek-v4-flash";
 const API_ENDPOINT = "https://api.deepseek.com/v1";
