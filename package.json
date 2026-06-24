@@ -1,6 +1,6 @@
 {
   "name": "@ai-zen/air",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "极简 AI 命令行助手",
   "type": "module",
   "main": "./dist/agent-runtime.js",
@@ -15,7 +15,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@ai-zen/agents-core": "file:../agents/packages/core",
+    "@ai-zen/agents-core": "^2.4.0",
     "chalk": "^5.6.2",
     "commander": "^15.0.0",
     "inquirer": "^9.3.8"
