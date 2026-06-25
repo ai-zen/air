@@ -65,7 +65,15 @@ export async function generateMigrationDoc(messages: any[]): Promise<string> {
 4. 语言风格与原始对话一致（中文）`)],
     tools: [],
   });
-  const result = await agent.send(`请阅读以下对话历史，生成交接文档：\n\n${messages.map((m) => `[${m.role}] ${typeof m.content === "string" ? m.content : ""}`).join("\n\n")}`);
+  const historyJson = JSON.stringify(messages, null, 2);
+  const result = await agent.send(`请分析以下对话历史（JSON 格式）并生成交接文档。
+
+这是 AI 助手与用户的完整对话记录，每条消息包含 role（角色）和 content（内容）字段。
+你可以使用 shell 工具读取文件、查看项目结构来验证对话中提到的信息。
+
+\`\`\`json
+${historyJson}
+\`\`\``);
   const last = result.at(-1);
   if (!last || last.status === "error") throw new Error("生成交接文档失败");
   return typeof last.content === "string" ? last.content : "";
