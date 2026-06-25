@@ -1,6 +1,6 @@
 {
   "name": "@ai-zen/air",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "极简 AI 命令行助手",
   "type": "module",
   "main": "./dist/agent-runtime.js",
