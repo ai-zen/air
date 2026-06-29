@@ -177,7 +177,7 @@ describe("E2E: 真实 API 对话", () => {
 
     // Interactive mode: /new then exit
     const result = await runCli([], "/new\n/exit\n", env);
-    expect(result.stdout).toContain("🆕 重新开始");
+    expect(result.stdout).toContain("🆕 新会话");
 
     // Verify context was reset
     msgs = JSON.parse(readFileSync(contextFile, "utf-8"));
