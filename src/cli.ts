@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import { Command } from "commander";
-import { runConversation } from "./session/runtime.js";
+import { runChat } from "./chat/runtime.js";
 import { installHook, uninstallHook } from "./hook.js";
 import { readConfig, saveConfig } from "./config.js";
 
@@ -57,7 +57,7 @@ program
       console.error("   获取 Key: https://platform.deepseek.com/api_keys");
       process.exit(1);
     }
-    await runConversation(message?.join(" "));
+    await runChat(message?.join(" "));
   });
 
 program.parse(process.argv);

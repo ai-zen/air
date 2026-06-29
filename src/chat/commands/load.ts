@@ -1,11 +1,11 @@
 import { Message } from "@ai-zen/agents-core";
 import inquirer from "inquirer";
-import type { SessionCtx } from "../shared.js";
+import type { ChatCtx } from "../shared.js";
 import { SYSTEM_PROMPT } from "../shared.js";
 import { listSnapshots, loadSnapshot, saveMessages } from "../../config.js";
 import { buildAgent } from "../../agent-factory.js";
 
-export async function cmdLoad(ctx: SessionCtx): Promise<void> {
+export async function cmdLoad(ctx: ChatCtx): Promise<void> {
   const snapshots = listSnapshots();
   if (snapshots.length === 0) {
     console.log("\n📭 没有可用的快照\n");

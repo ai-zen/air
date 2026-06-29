@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { SessionCtx } from "../session/shared.js";
+import type { ChatCtx } from "../chat/shared.js";
 
 // Mock all external dependencies
 vi.mock("inquirer", () => ({ default: { prompt: vi.fn() } }));
@@ -16,7 +16,7 @@ vi.mock("../agent-factory.js", () => ({
     send: vi.fn(),
   })),
 }));
-vi.mock("../session/print.js", () => ({
+vi.mock("../chat/print.js", () => ({
   sendAndPrint: vi.fn(),
 }));
 
@@ -24,18 +24,18 @@ const mockPrompt = vi.mocked((await import("inquirer")).default.prompt);
 const { saveMessages, saveSnapshot, listSnapshots, loadSnapshot } = await import("../config.js");
 const { buildAgent } = await import("../agent-factory.js");
 
-function makeCtx(msgs: any[] = []): SessionCtx {
+function makeCtx(msgs: any[] = []): ChatCtx {
   return { agent: { messages: msgs, events: { on: vi.fn(), off: vi.fn() }, send: vi.fn() } as any };
 }
 
-// ==================== shared.ts ====================
+// ==================== cmdNew ====================
 
-describe("saveAndNew", () => {
+describe("cmdNew", () => {
   it("写入 system prompt 并构建 agent", async () => {
-    const { saveAndNew } = await import("../session/shared.js");
+    const { cmdNew } = await import("../chat/commands/new.js");
     const ctx = makeCtx();
 
-    await saveAndNew(ctx);
+    await cmdNew(ctx);
 
     expect(saveMessages).toHaveBeenCalledWith(
       expect.arrayContaining([expect.objectContaining({ role: "system" })])
@@ -54,28 +54,28 @@ describe("dispatchCommand", () => {
 
   it('"/exit" 调用 cmdExit（process.exit）', async () => {
     // Can't easily test process.exit, just verify it doesn't throw
-    const { runConversation } = await import("../session/runtime.js");
+    const { runChat } = await import("../chat/runtime.js");
     // dispatchCommand is internal, tested via routing only
   });
 
   it('"/save" 调用 cmdSave', async () => {
-    const { cmdSave } = await import("../session/commands/save.js");
+    const { cmdSave } = await import("../chat/commands/save.js");
     const ctx = makeCtx([{ role: "system", content: "sys" }]);
     await cmdSave(ctx);
     expect(saveSnapshot).toHaveBeenCalledWith(ctx.agent.messages);
   });
 
   it('"/new" 调用 cmdNew 并打印提示', async () => {
-    const { cmdNew } = await import("../session/commands/new.js");
+    const { cmdNew } = await import("../chat/commands/new.js");
     const ctx = makeCtx();
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
     await cmdNew(ctx);
-    expect(spy).toHaveBeenCalledWith("\n🆕 重新开始\n");
+    expect(spy).toHaveBeenCalledWith("\n🆕 新会话\n");
     spy.mockRestore();
   });
 
   it('"/help" 打印帮助信息', async () => {
-    const { cmdHelp } = await import("../session/commands/help.js");
+    const { cmdHelp } = await import("../chat/commands/help.js");
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
     cmdHelp();
     expect(spy).toHaveBeenCalled();
@@ -91,7 +91,7 @@ describe("cmdBack", () => {
   });
 
   it("没有消息时提示无可撤回", async () => {
-    const { cmdBack } = await import("../session/commands/back.js");
+    const { cmdBack } = await import("../chat/commands/back.js");
     const ctx = makeCtx([{ role: "system", content: "sys" }]);
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
     await cmdBack(ctx);
@@ -100,7 +100,7 @@ describe("cmdBack", () => {
   });
 
   it("取消操作时不修改消息", async () => {
-    const { cmdBack } = await import("../session/commands/back.js");
+    const { cmdBack } = await import("../chat/commands/back.js");
     const msgs = [
       { role: "system", content: "sys" },
       { role: "user", content: "你好" },
@@ -120,7 +120,7 @@ describe("cmdLoad", () => {
   });
 
   it("没有快照时提示", async () => {
-    const { cmdLoad } = await import("../session/commands/load.js");
+    const { cmdLoad } = await import("../chat/commands/load.js");
     const ctx = makeCtx();
     vi.mocked(listSnapshots).mockReturnValueOnce([]);
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
@@ -138,7 +138,7 @@ describe("cmdEditor", () => {
   });
 
   it("取消编辑不报错", async () => {
-    const { cmdEditor } = await import("../session/commands/editor.js");
+    const { cmdEditor } = await import("../chat/commands/editor.js");
     const ctx = makeCtx();
     mockPrompt.mockResolvedValueOnce({ content: "" });
     await cmdEditor(ctx);

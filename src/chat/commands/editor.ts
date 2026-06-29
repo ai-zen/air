@@ -1,9 +1,9 @@
 import inquirer from "inquirer";
-import type { SessionCtx } from "../shared.js";
+import type { ChatCtx } from "../shared.js";
 import { sendAndPrint } from "../print.js";
 import { saveMessages } from "../../config.js";
 
-export async function cmdEditor(ctx: SessionCtx) {
+export async function cmdEditor(ctx: ChatCtx) {
   const { content } = await inquirer.prompt([
     { type: "editor", name: "content", message: "编辑消息:" },
   ]);

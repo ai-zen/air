@@ -52,6 +52,16 @@ air hook uninstall
 | `/editor` | 打开系统编辑器输入多行文本 |
 | `/help` | 帮助 |
 
+### 兜底终端钩子
+
+安装后，任何 shell 中不存在的命令都会自动转发到 `air`，AI 会解读你的意图并帮助你。
+
+```bash
+$ gred "hello" file.txt
+# → command not found → 自动转发到 air
+# → AI: "你是不是想用 grep？"
+```
+
 ## 设计
 
 ```
@@ -75,20 +85,35 @@ air hook uninstall
 ```
 src/
 ├── cli.ts              # CLI 入口，commander
-├── config.ts           # 配置与文件读写
-├── delta-renderer.ts   # 流式渲染器（复用自 agents 项目）
+├── config.ts           # 配置、上下文、快照读写
+├── delta-renderer.ts   # 流式渲染器
+├── hook.ts             # 兜底终端钩子（install/uninstall）
+├── migration.ts        # 上下文计数与迁移
 ├── tools.ts            # 工具定义——shell
 ├── agent-factory.ts    # Agent 工厂——构建模型与 Agent
-├── migration.ts        # 上下文计数与任务迁移
-├── agent-runtime.ts    # 运行时——对话循环与命令处理
-├── hook.ts             # 兜底终端钩子（install/uninstall）
+├── chat/
+│   ├── shared.ts       # ChatCtx 类型 & SYSTEM_PROMPT
+│   ├── runtime.ts      # runChat() & chatLoop() — 核心运行时
+│   ├── message.ts      # handleMessage() — 发送与迁移
+│   ├── print.ts        # sendAndPrint() — 流式输出
+│   └── commands/
+│       ├── index.ts    # dispatchCommand() — 命令分发入口
+│       ├── back.ts     # /back — 撤回消息
+│       ├── editor.ts   # /editor — 多行编辑器输入
+│       ├── exit.ts     # /exit — 退出
+│       ├── help.ts     # /help
+│       ├── load.ts     # /load — 加载快照
+│       ├── new.ts      # /new — 新会话
+│       └── save.ts     # /save — 保存快照
 └── __tests__/
+    ├── chat.test.ts    # 聊天测试
     ├── config.test.ts  # 配置/上下文/快照测试
     ├── main.test.ts    # contextSize/shouldMigrate 测试
+    ├── e2e.test.ts     # 端到端测试
     └── tools.test.ts   # shell 工具结构测试
 ```
 
-共 46 KB，870 行。
+共 49 KB，881 行。
 
 ## 测试
 

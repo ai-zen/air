@@ -1,12 +1,12 @@
 import { Message } from "@ai-zen/agents-core";
-import type { SessionCtx } from "./shared.js";
+import type { ChatCtx } from "./shared.js";
 import { SYSTEM_PROMPT } from "./shared.js";
 import { sendAndPrint } from "./print.js";
 import { saveMessages, saveSnapshot } from "../config.js";
 import { buildAgent } from "../agent-factory.js";
 import { contextSize, shouldMigrate, generateMigrationDoc, MAX_CONTEXT_CHARS } from "../migration.js";
 
-export async function handleMessage(ctx: SessionCtx, text: string): Promise<void> {
+export async function handleMessage(ctx: ChatCtx, text: string): Promise<void> {
   try {
     await sendAndPrint(ctx.agent, text);
     saveMessages(ctx.agent.messages);

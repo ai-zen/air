@@ -1,10 +1,10 @@
 import inquirer from "inquirer";
-import type { SessionCtx } from "../shared.js";
+import type { ChatCtx } from "../shared.js";
 import { sendAndPrint } from "../print.js";
 import { saveMessages } from "../../config.js";
 import { buildAgent } from "../../agent-factory.js";
 
-export async function cmdBack(ctx: SessionCtx): Promise<void> {
+export async function cmdBack(ctx: ChatCtx): Promise<void> {
   const targets: { index: number; role: string; label: string; preview: string }[] = [];
   for (let i = 0; i < ctx.agent.messages.length; i++) {
     const msg = ctx.agent.messages[i];

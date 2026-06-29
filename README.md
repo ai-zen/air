@@ -85,20 +85,35 @@ $ gred "hello" file.txt
 ```
 src/
 ├── cli.ts              # CLI entry, commander
-├── config.ts           # Config read/write
-├── delta-renderer.ts   # Stream renderer (from agents project)
+├── config.ts           # Config, context, snapshot read/write
+├── delta-renderer.ts   # Stream renderer
+├── hook.ts             # Fallback terminal hook (install/uninstall)
+├── migration.ts        # Context counting & migration
 ├── tools.ts            # Tool definitions — shell
 ├── agent-factory.ts    # Agent factory — build model & agent
-├── migration.ts        # Context counting & migration
-├── agent-runtime.ts    # Runtime — conversation loop & commands
-├── hook.ts             # Fallback terminal hook (install/uninstall)
+├── chat/
+│   ├── shared.ts       # ChatCtx type & SYSTEM_PROMPT
+│   ├── runtime.ts      # runChat() & chatLoop() — core runtime
+│   ├── message.ts      # handleMessage() — send & migrate
+│   ├── print.ts        # sendAndPrint() — stream output
+│   └── commands/
+│       ├── index.ts    # dispatchCommand() — command router
+│       ├── back.ts     # /back — recall & resend
+│       ├── editor.ts   # /editor — multi-line input
+│       ├── exit.ts     # /exit — quit
+│       ├── help.ts     # /help
+│       ├── load.ts     # /load — load snapshot
+│       ├── new.ts      # /new — new session
+│       └── save.ts     # /save — save snapshot
 └── __tests__/
+    ├── chat.test.ts    # Chat session tests
     ├── config.test.ts  # Config/context/snapshot tests
     ├── main.test.ts    # contextSize/shouldMigrate tests
+    ├── e2e.test.ts     # End-to-end tests
     └── tools.test.ts   # Shell tool structure tests
 ```
 
-~46 KB, 870 lines.
+~49 KB, 881 lines.
 
 ## Tests
 

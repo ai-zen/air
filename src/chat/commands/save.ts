@@ -1,6 +1,6 @@
-import type { SessionCtx } from "../shared.js";
+import type { ChatCtx } from "../shared.js";
 import { saveSnapshot } from "../../config.js";
 
-export async function cmdSave(ctx: SessionCtx) {
+export async function cmdSave(ctx: ChatCtx) {
   console.log(`\n✅ 快照: ${saveSnapshot(ctx.agent.messages)}\n`);
 }
