@@ -4,7 +4,7 @@ import { readConfig } from "./config.js";
 import { shellTool } from "./tools.js";
 
 const MODEL_NAME = "deepseek-v4-flash";
-const API_ENDPOINT = "https://api.deepseek.com/v1";
+const API_ENDPOINT = process.env.AIR_API_ENDPOINT || "https://api.deepseek.com/v1";
 
 async function buildModel(apiKey: string) {
   const endpoint = new OpenAI({ openai_endpoint: API_ENDPOINT, api_key: apiKey });

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import { Command } from "commander";
-import { runConversation } from "./agent-runtime.js";
+import { runConversation } from "./session/runtime.js";
 import { installHook, uninstallHook } from "./hook.js";
 import { readConfig, saveConfig } from "./config.js";
 
@@ -49,15 +49,15 @@ program
   });
 
 program
-  .argument("[message]", "要发送的消息（不传则进入交互模式）")
-  .action(async (message?: string) => {
+  .argument("[message...]", "要发送的消息（不传则进入交互模式）")
+  .action(async (message?: string[]) => {
     const config = readConfig();
     if (!config.apiKey) {
       console.error("❌ 请先设置 API Key: air key <your-key>");
       console.error("   获取 Key: https://platform.deepseek.com/api_keys");
       process.exit(1);
     }
-    await runConversation(message);
+    await runConversation(message?.join(" "));
   });
 
 program.parse(process.argv);

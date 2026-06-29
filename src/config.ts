@@ -10,7 +10,7 @@ export interface Config {
 
 // ==================== 路径 ====================
 
-const AIR_DIR = () => join(homedir(), ".ai-zen", "air");
+const AIR_DIR = () => process.env.AIR_DIR || join(homedir(), ".ai-zen", "air");
 const CONFIG_FILE = () => join(AIR_DIR(), "config.json");
 const CONTEXT_FILE = () => join(AIR_DIR(), "context.json");
 const SNAPSHOTS_DIR = () => join(AIR_DIR(), "snapshots");
