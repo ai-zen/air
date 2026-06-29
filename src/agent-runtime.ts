@@ -90,7 +90,7 @@ export async function runChat(initialMessage?: string): Promise<void> {
   const agent: Agent = await buildAgent(msgs);
   const ctx: ChatCtx = {
     agent,
-    send: (text: string) => send(agent, text),
+    send(text: string) { return send(this.agent, text); },
   };
 
   if (initialMessage) {

@@ -69,14 +69,14 @@ $ gred "hello" file.txt
 ├── config.json       # { "apiKey": "sk-xxx" }
 ├── context.json      # [ { role, content }, ... ]    Current conversation
 ├── snapshots/        # Auto snapshots before migration or /save
-└── temp/             # Long-term memory written by AI (*.md)
+└── memory/           # Long-term memory written by AI (*.md)
 ```
 
 ### Core Philosophy
 
 - **Model**: DeepSeek-V4-Flash (hardcoded, only one)
 - **Tool**: Just one `shell` tool — the AI executes commands, reads and writes files through it
-- **Memory**: The AI decides what to remember, writes to `temp/*.md` via shell, reads on next startup. No extra persistence mechanism
+- **Memory**: The AI decides what to remember, writes to `memory/*.md` via shell, reads on next startup. No extra persistence mechanism
 - **Context**: Auto-migrates when JSON serialization exceeds 500K chars, takes a snapshot before migration
 - **Rules**: Consult the user before making changes. Dangerous operations require explicit written confirmation. The user takes responsibility for their own instructions
 
@@ -84,36 +84,34 @@ $ gred "hello" file.txt
 
 ```
 src/
-├── cli.ts              # CLI entry, commander
-├── config.ts           # Config, context, snapshot read/write
-├── delta-renderer.ts   # Stream renderer
-├── hook.ts             # Fallback terminal hook (install/uninstall)
-├── migration.ts        # Context counting & migration
-├── tools.ts            # Tool definitions — shell
-├── agent-factory.ts    # Agent factory — build model & agent
-├── chat/
-│   ├── shared.ts       # ChatCtx type & SYSTEM_PROMPT
-│   ├── runtime.ts      # runChat() & chatLoop() — core runtime
-│   ├── message.ts      # handleMessage() — send & migrate
-│   ├── print.ts        # sendAndPrint() — stream output
-│   └── commands/
-│       ├── index.ts    # dispatchCommand() — command router
-│       ├── back.ts     # /back — recall & resend
-│       ├── editor.ts   # /editor — multi-line input
-│       ├── exit.ts     # /exit — quit
-│       ├── help.ts     # /help
-│       ├── load.ts     # /load — load snapshot
-│       ├── new.ts      # /new — new session
-│       └── save.ts     # /save — save snapshot
+├── cli.ts                # CLI entry, commander
+├── config.ts             # Config, context, snapshot read/write
+├── delta-renderer.ts     # Stream renderer
+├── hook.ts               # Fallback terminal hook (install/uninstall)
+├── migration.ts          # Context counting & migration
+├── tools.ts              # Tool definitions — shell
+├── agent-factory.ts      # Agent factory — build model & agent
+├── agent-runtime.ts      # Core runtime — send, chat loop
+├── agent-types.ts        # Type definitions (ChatCtx, etc.)
+├── agent-constants.ts    # System prompt & constants
+├── agent-commands/       # Interactive command handlers
+│   ├── index.ts          # dispatchCommand() — command router
+│   ├── back.ts           # /back — recall & resend
+│   ├── editor.ts         # /editor — multi-line input
+│   ├── exit.ts           # /exit — quit
+│   ├── help.ts           # /help
+│   ├── load.ts           # /load — load snapshot
+│   ├── new.ts            # /new — new session
+│   └── save.ts           # /save — save snapshot
 └── __tests__/
-    ├── chat.test.ts    # Chat session tests
-    ├── config.test.ts  # Config/context/snapshot tests
-    ├── main.test.ts    # contextSize/shouldMigrate tests
-    ├── e2e.test.ts     # End-to-end tests
-    └── tools.test.ts   # Shell tool structure tests
+    ├── chat.test.ts      # Chat session tests
+    ├── config.test.ts    # Config/context/snapshot tests
+    ├── main.test.ts      # contextSize/shouldMigrate tests
+    ├── e2e.test.ts       # End-to-end tests
+    └── tools.test.ts     # Shell tool structure tests
 ```
 
-~49 KB, 881 lines.
+~76 KB, 879 lines (excluding tests).
 
 ## Tests
 
