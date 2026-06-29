@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import { Command } from "commander";
-import { runChat } from "./chat/runtime.js";
+import { runChat } from "./agent-runtime.js";
 import { installHook, uninstallHook } from "./hook.js";
 import { readConfig, saveConfig } from "./config.js";
 

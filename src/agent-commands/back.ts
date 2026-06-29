@@ -1,8 +1,7 @@
 import inquirer from "inquirer";
-import type { ChatCtx } from "../shared.js";
-import { sendAndPrint } from "../print.js";
-import { saveMessages } from "../../config.js";
-import { buildAgent } from "../../agent-factory.js";
+import type { ChatCtx } from "../agent-types.js";
+import { saveMessages } from "../config.js";
+import { buildAgent } from "../agent-factory.js";
 
 export async function cmdBack(ctx: ChatCtx): Promise<void> {
   const targets: { index: number; role: string; label: string; preview: string }[] = [];
@@ -75,7 +74,7 @@ export async function cmdBack(ctx: ChatCtx): Promise<void> {
     }
 
     ctx.agent = await buildAgent(ctx.agent.messages);
-    await sendAndPrint(ctx.agent, textToSend);
+    await ctx.send(textToSend);
     saveMessages(ctx.agent.messages);
   } else {
     console.log("\n💡 请输入一条新消息继续对话\n");
@@ -84,7 +83,7 @@ export async function cmdBack(ctx: ChatCtx): Promise<void> {
     ]);
     if (!newMessage.trim()) { console.log("\n已取消\n"); return; }
     ctx.agent = await buildAgent(ctx.agent.messages);
-    await sendAndPrint(ctx.agent, newMessage.trim());
+    await ctx.send(newMessage.trim());
     saveMessages(ctx.agent.messages);
   }
 }

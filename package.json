@@ -1,6 +1,6 @@
 {
   "name": "@ai-zen/air",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Minimalist AI CLI assistant — one shell tool, filesystem memory, auto context migration",
   "type": "module",
   "main": "./dist/agent-runtime.js",

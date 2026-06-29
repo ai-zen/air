@@ -1,9 +1,9 @@
 import { Message } from "@ai-zen/agents-core";
 import inquirer from "inquirer";
-import type { ChatCtx } from "../shared.js";
-import { SYSTEM_PROMPT } from "../shared.js";
-import { listSnapshots, loadSnapshot, saveMessages } from "../../config.js";
-import { buildAgent } from "../../agent-factory.js";
+import type { ChatCtx } from "../agent-types.js";
+import { SYSTEM_PROMPT } from "../agent-constants.js";
+import { listSnapshots, loadSnapshot, saveMessages } from "../config.js";
+import { buildAgent } from "../agent-factory.js";
 
 export async function cmdLoad(ctx: ChatCtx): Promise<void> {
   const snapshots = listSnapshots();

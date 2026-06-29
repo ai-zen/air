@@ -1,9 +1,3 @@
-import { Agent } from "@ai-zen/agents-core";
-
-export interface ChatCtx {
-  agent: Agent;
-}
-
 export const SYSTEM_PROMPT = [
   "你是一个AI助手，专门帮助用户回答问题和执行任务。请用中文回复。",
   "",

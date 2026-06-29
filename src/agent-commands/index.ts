@@ -1,4 +1,4 @@
-import type { ChatCtx } from "../shared.js";
+import type { ChatCtx } from "../agent-types.js";
 import { cmdExit } from "./exit.js";
 import { cmdHelp } from "./help.js";
 import { cmdSave } from "./save.js";
