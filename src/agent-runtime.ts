@@ -70,7 +70,16 @@ export async function runConversation(initialMessage?: string): Promise<void> {
   let agent = await buildAgent(msgs);
 
   if (initialMessage) {
-    console.log(`\n💬 你: ${initialMessage}`);
+    // 有旧对话则先存档，再开新对话
+    const hasHistory = agent.messages.some(m => m.role === "user" || m.role === "assistant");
+    if (hasHistory) {
+      const snap = saveSnapshot(agent.messages);
+      console.log(`💾 已存档旧对话: ${snap}\n`);
+    }
+    msgs = [Message.System(SYSTEM_PROMPT)];
+    saveMessages(msgs);
+    agent = await buildAgent(msgs);
+    console.log(`💬 你: ${initialMessage}`);
     try {
       await sendAndSave(agent, initialMessage);
       saveMessages(agent.messages);
