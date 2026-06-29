@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 import { Command } from "commander";
 import { runConversation } from "./agent-runtime.js";
+import { installHook, uninstallHook } from "./hook.js";
 import { readConfig, saveConfig } from "./config.js";
 
 const { version } = JSON.parse(
@@ -31,6 +32,20 @@ program
     const c = readConfig();
     const key = c.apiKey ? "****" + c.apiKey.slice(-4) : "(未设置)";
     console.log(`API Key: ${key}`);
+  });
+
+program
+  .command("hook")
+  .description("安装/卸载兜底终端钩子（命令不存在时自动转发到 air）")
+  .argument("<action>", "install 或 uninstall")
+  .action((action: string) => {
+    if (action === "install") {
+      installHook();
+    } else if (action === "uninstall") {
+      uninstallHook();
+    } else {
+      console.error('❌ 未知操作，请使用 install 或 uninstall');
+    }
   });
 
 program
