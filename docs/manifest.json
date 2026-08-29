@@ -1,0 +1,28 @@
+{
+  "name": "air",
+  "npm": "@ai-zen/air",
+  "description": {
+    "zh": "极简 AI 命令行助手——只有一个 shell 工具，AI 用文件系统记忆，上下文满了自动迁移",
+    "en": "Minimalist AI CLI assistant — one shell tool, filesystem memory, auto context migration"
+  },
+  "version": "0.3.3",
+  "docsRoot": "docs",
+  "locales": ["zh", "en"],
+  "defaultLocale": "zh",
+  "entry": {
+    "zh": "zh/index.md",
+    "en": "en/index.md"
+  },
+  "sections": {
+    "zh": [
+      { "title": "快速开始", "path": "zh/getting-started.md" },
+      { "title": "CLI 使用", "path": "zh/cli.md" },
+      { "title": "核心概念", "path": "zh/concepts.md" }
+    ],
+    "en": [
+      { "title": "Getting Started", "path": "en/getting-started.md" },
+      { "title": "CLI Usage", "path": "en/cli.md" },
+      { "title": "Core Concepts", "path": "en/concepts.md" }
+    ]
+  }
+}
